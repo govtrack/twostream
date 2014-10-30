@@ -11,7 +11,6 @@ head_template = Template("""
 $(document).ajaxSend(function(event, xhr, settings) { if (!/^https?:.*/.test(settings.url)) xhr.setRequestHeader("X-CSRFToken", "{{csrf_token|escapejs}}"); });
 var the_user = {{user_data|safe}};
 var the_page = {{page_data|safe}};
-{% include "user_head_script.js" %}
 """)
 
 @cache_control(private=True, must_revalidate=True)
