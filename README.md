@@ -71,8 +71,35 @@ The decorator also sets `request.anonymous` to True so you can tell what happene
 
 Also make sure that you don't use any request middleware that is somehow able to modify the response based on any of the HTTP headers that might have user information, since they are only cleared at the start of view processing. Request middleware will still see it.
 
-Head Tag
---------
+HTTP Server Caching
+-------------------
+
+Configure your HTTP server or caching layer to cache appropriately. Here is how I do this in nginx when serving Django via uWSGI:
+
+At the top of nginx.conf:
+
+	uwsgi_cache_path  /path/to/cache/storage levels=1:2 keys_zone=mydomain.com:100m inactive=72h max_size=1g;
+
+In the `server` block:
+
+	uwsgi_cache mydomain.com;
+	uwsgi_cache_key "$scheme$request_method$host$request_uri";
+	uwsgi_cache_valid 200 1h;
+	uwsgi_cache_valid 301 5m;
+	uwsgi_cache_valid 404 60s;
+	uwsgi_cache_valid any 5s;
+	uwsgi_cache_use_stale timeout invalid_header updating;
+	uwsgi_no_cache $arg_nocache;
+	uwsgi_cache_bypass $arg_nocache;
+
+Some notes:
+
+	* Nginx is smart enough to look at the cache headers in the HTTP response from Django to figure out what responses to cache.
+	* I'm caching normal responses for 1 hour and other sorts of responses (redirects, 404s) for other shorter amounts of time.
+	* The presence of "nocache=1" in the URL's query string will block caching, which is nice for testing.
+
+Head Tag and User-Specific Content
+----------------------------------
 
 In order to get user-sepecific information on anonymous pages, and/or to provide CSRF tokens for AJAX calls, add to your URLconf:
 
