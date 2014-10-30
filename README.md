@@ -7,7 +7,7 @@ There are many ways to do caching. This one I find structurally simple. Usage co
 
 1) This app provides a decorator named `@anonymous_view` to be applied to views that generate same output no matter who is accessing it. These views are thus safe to cache. To protect you by clearing all information in the HttpRequest that might be user-specific (including session, cookies, etc.) It also marks the HttpResponse as cachable by your HTTP server (if your server is configured to do that).
 
-2) The app provides a snippet to include in your <head> tag to fetch user-specific information (if the user is logged in, page-specific content) and set a CSRF variable on all jQuery AJAX requests. This way, on pages marked with `@anomyous_view`, you can still display user-specific content and make AJAX calls.
+2) The app provides a snippet to include in your `<head>` tag to fetch user-specific information (if the user is logged in, page-specific content) and set a CSRF variable on all jQuery AJAX requests. This way, on pages marked with `@anomyous_view`, you can still display user-specific content and make AJAX calls.
 
 Installation / Middleware
 -------------------------
@@ -78,11 +78,11 @@ In order to get user-sepecific information on anonymous pages, and/or to provide
 
 	url(r'^_twostream', include('twostream.urls')),
 
-And in the <head> part of your base template or at the end of your <body> (to delay the script load) add:
+And in the `<head>` part of your base template or at the end of your `<body>` (to delay the script load) add:
 
 	{% include "twostream/head.html" %}
 
-which adds a <script> tag that generates code that looks like this:
+which adds a `<script>` tag that generates code that looks like this:
 
 	$(document).ajaxSend(function(event, xhr, settings) { if (!/^https?:.*/.test(settings.url)) xhr.setRequestHeader("X-CSRFToken", "THE CSRF TOKEN"); });
 	var the_user = {
