@@ -8,7 +8,12 @@ import json
 
 head_template_mime_type = "application/javascript"
 head_template = Template("""
-$(document).ajaxSend(function(event, xhr, settings) { if (!/^https?:.*/.test(settings.url)) xhr.setRequestHeader("X-CSRFToken", "{{csrf_token|escapejs}}"); });
+$(document).ajaxSend(
+	function(event, xhr, settings) {
+		if (!this.crossDomain && !/^(GET|HEAD|OPTIONS|TRACE)$/.test(settings.type))
+			xhr.setRequestHeader("X-CSRFToken", "{{csrf_token|escapejs}}");
+	}
+);
 var the_user = {{user_data|safe}};
 var the_page = {{page_data|safe}};
 """)
