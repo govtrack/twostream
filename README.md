@@ -109,7 +109,7 @@ And in the `<head>` part of your base template or at the end of your `<body>` (t
 
 	{% include "twostream/head.html" %}
 
-which adds a `<script>` tag that generates code that looks like this:
+which adds a `<script>` tag that generates code that looks a little like this:
 
 	$(document).ajaxSend(function(event, xhr, settings) { if (!/^https?:.*/.test(settings.url)) xhr.setRequestHeader("X-CSRFToken", "THE CSRF TOKEN"); });
 	var the_user = {
@@ -117,6 +117,7 @@ which adds a `<script>` tag that generates code that looks like this:
 	};
 	var the_page = {
 	};
+	var django_messages = [];
 
 This part works with jQuery 1.8+.
 
@@ -137,3 +138,22 @@ This part works with jQuery 1.8+.
 	    }
 
 The returned dict from the user view function is returned in the JSON object `the_page` accessible from Javascript.
+
+Django Messages Framework
+-------------------------
+
+The Django [messages framework](https://docs.djangoproject.com/en/dev/ref/contrib/messages/) provides a way to queue one-time messages for users. This app's head script (explained in the last section) also reads the user's latest messages and stores them in a client-side variable.
+
+If you use the messages framework, you will need to display those messages. After the include tag, process the messages like this:
+
+    {% include "twostream/head.html" %}
+    <script>
+      if (django_messages.length > 0) {
+        for (var i = 0; i < django_messages.length; i++) {
+          display_message(django_messages[i].level_tag, django_messages[i].message);
+        }
+      }
+    </script>
+
+Each entry in the `django_messages` array has all of the fields on the [Message class](https://docs.djangoproject.com/en/dev/ref/contrib/messages/#the-message-class).
+
