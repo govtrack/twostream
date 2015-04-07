@@ -22,8 +22,6 @@ var django_messages = {{django_messages|safe}};
 
 @cache_control(private=True, must_revalidate=True)
 def user_head(request):
-	m = resolve(request.GET.get("path", request.GET.get("view", "")))
-	
 	# return information about the user
 	user_data = None
 	if request.user.is_authenticated():
@@ -32,8 +30,16 @@ def user_head(request):
 			user_data.update(request.user.twostream_data)
 		
 	# call a view-specific custom function
+	try:
+		# get the view function corresponding to the path passed in the query string
+		m = resolve(request.GET.get("path", request.GET.get("view", "")))
+	except:
+		# 'path' might be empty --- the Django 500 template handler doesn't have access
+		# to the request object and inadvertently will pass the empty string --- or something
+		# invalid might be passed in, and we can just gracefully skip this part
+		m = None
 	page_data = None
-	if hasattr(m.func, 'user_func'):
+	if m and hasattr(m.func, 'user_func'):
 		try:
 			page_data = m.func.user_func(request, *m.args, **m.kwargs)
 		except Http404:
