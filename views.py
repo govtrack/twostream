@@ -27,7 +27,10 @@ def user_head(request):
 	if request.user.is_authenticated():
 		user_data = { "email": request.user.email }
 		if hasattr(request.user, 'twostream_data'):
-			user_data.update(request.user.twostream_data)
+			d = request.user.twostream_data
+			if callable(d):
+				d = d()
+			user_data.update(d)
 		
 	# call a view-specific custom function
 	try:
