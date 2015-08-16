@@ -36,7 +36,7 @@ def user_head(request):
 	try:
 		# get the view function corresponding to the path passed in the query string
 		m = resolve(request.GET.get("path", request.GET.get("view", "")))
-	except:
+	except Http404:
 		# 'path' might be empty --- the Django 500 template handler doesn't have access
 		# to the request object and inadvertently will pass the empty string --- or something
 		# invalid might be passed in, and we can just gracefully skip this part
