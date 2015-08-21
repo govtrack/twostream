@@ -9,12 +9,29 @@ import json
 
 head_template_mime_type = "application/javascript"
 head_template = Template("""
-$(document).ajaxSend(
-	function(event, xhr, settings) {
+var twostream_ajax_csrf_token = "{{csrf_token|escapejs}}";
+$(document).ajaxSend(function(event, xhr, settings) {
+		// Attach CSRF token to request.
 		if (!this.crossDomain && !/^(GET|HEAD|OPTIONS|TRACE)$/.test(settings.type))
-			xhr.setRequestHeader("X-CSRFToken", "{{csrf_token|escapejs}}");
+			xhr.setRequestHeader("X-CSRFToken", twostream_ajax_csrf_token);
+	});
+$( document ).ajaxSuccess(function( event, xhr, settings ) {
+	// Update CSRF token if set in a response cookie.
+	function getCookie(name) {
+		var cookieValue = null;
+		if (document.cookie && document.cookie != '') {
+			var cookies = document.cookie.split(';');
+			for (var i = 0; i < cookies.length; i++) {
+				var cookie = cookies[i].replace(/^\s+/, "").replace(/\s+$/, "");
+				if (cookie.substring(0, name.length + 1) == (name + '='))
+					return decodeURIComponent(cookie.substring(name.length + 1));
+			}
+		}
+		return null;
 	}
-);
+	var new_csrf_token = getCookie('csrftoken');
+	if (new_csrf_token) twostream_ajax_csrf_token = new_csrf_token;
+});
 var the_user = {{user_data|safe}};
 var the_page = {{page_data|safe}};
 var django_messages = {{django_messages|safe}};
