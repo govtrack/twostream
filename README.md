@@ -1,7 +1,7 @@
 twostream
 =========
 
-Django 1.7 middleware that makes it easy to mark certain pages as being cachable at the HTTP server level while still being able to fetch user-specific content through AJAX.
+Django 1.7+ middleware that makes it easy to mark certain pages as being cachable at the HTTP server level while still being able to fetch user-specific content through AJAX.
 
 There are many ways to do caching. This one I find structurally simple. Usage comes in two parts:
 
